@@ -25,3 +25,17 @@ export const apiErrorSchema = z.object({
 });
 
 export type ApiError = z.infer<typeof apiErrorSchema>;
+
+export {
+  DEFAULT_GUILD_PREFIX,
+  guildIdSchema,
+  guildResponseSchema,
+  updateGuildSchema,
+  upsertGuildSchema,
+} from './schemas/guild.js';
+
+export type {
+  GuildResponse,
+  UpdateGuildInput,
+  UpsertGuildInput,
+} from './schemas/guild.js';
