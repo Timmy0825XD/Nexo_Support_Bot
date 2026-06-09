@@ -1,0 +1,23 @@
+{
+  "name": "mw-tournament-platform",
+  "private": true,
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "db:generate": "pnpm --filter @mw-platform/database generate",
+    "db:migrate": "pnpm --filter @mw-platform/database migrate:dev",
+    "db:push": "pnpm --filter @mw-platform/database db:push",
+    "dev:api": "pnpm --filter @mw-platform/api dev",
+    "dev:bot": "pnpm --filter @mw-platform/bot dev",
+    "dev:web": "pnpm --filter @mw-platform/web dev"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.4",
+    "typescript": "^5.8.3"
+  },
+  "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": ">=20"
+  }
+}
