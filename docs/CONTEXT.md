@@ -256,6 +256,7 @@ Nexo_Support_Bot/
 │   ├── CONTEXT.md
 │   ├── AGENTS.md
 │   ├── COMMANDS.md
+│   ├── EMOJIS.md
 │   └── GITFLOW.md
 ├── turbo.json
 ├── pnpm-workspace.yaml

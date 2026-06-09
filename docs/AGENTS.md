@@ -56,6 +56,9 @@ Crear un módulo NestJS por dominio: `guilds`, `tournaments`, `registration`, `s
 - Comandos con auto-discovery (carpeta `commands/` → registro dinámico).
 - `apiClient` centralizado con base URL desde env, timeout y manejo de errores uniforme.
 - `interaction.deferReply()` cuando la API tarde >3s.
+- **Respuestas en embeds** — inglés, claras, útiles y coherentes. Ver [`EMOJIS.md`](./EMOJIS.md).
+- Emojis personalizados desde `apps/bot/src/constants/emojis.ts` — nunca hardcodear IDs sueltos en comandos.
+- Helpers reutilizables en `apps/bot/src/utils/embeds.ts` (`successEmbed`, `errorEmbed`, `infoEmbed`).
 
 ### Next.js — front
 
@@ -343,6 +346,7 @@ Ver [`GITFLOW.md`](./GITFLOW.md) para ramas, PRs y versionado. Resumen de commit
 - [ ] Comandos de torneo identifican `tournamentId`
 - [ ] Interacciones Discord no exceden timeout (defer si necesario)
 - [ ] Comando autocontenido
+- [ ] Respuestas en inglés con embeds; emojis desde `constants/emojis.ts`
 
 ### Front
 
@@ -362,5 +366,6 @@ Ver [`GITFLOW.md`](./GITFLOW.md) para ramas, PRs y versionado. Resumen de commit
 | `docs/AGENTS.md` | Reglas técnicas y de proceso | Español |
 | `docs/COMMANDS.md` | Referencia de comandos del bot | Español (specs) / Inglés (nombres del bot) |
 | `docs/GITFLOW.md` | Flujo Git Flow, commits y PRs | Español |
+| `docs/EMOJIS.md` | Emojis personalizados del bot | Español |
 | Código fuente | Implementación | Inglés |
 | Bot + Front (usuarios) | Interacción con staff y equipos | Inglés |
