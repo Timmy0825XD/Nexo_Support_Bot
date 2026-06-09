@@ -1,18 +1,13 @@
-import { SlashCommandBuilder } from 'discord.js';
-import type { SlashCommand } from '../types.js';
 import { CUSTOM_EMOJIS, EMBED_COLORS } from '../../constants/emojis.js';
 import { embedField, infoEmbed } from '../../utils/embeds.js';
+import type { PrefixCommand } from '../types.js';
 
-export const pingCommand: SlashCommand = {
-  data: new SlashCommandBuilder()
-    .setName('ping')
-    .setDescription('Check bot latency and API connection status'),
+export const pingPrefixCommand: PrefixCommand = {
+  name: 'ping',
 
-  async execute(interaction, { apiClient }) {
+  async execute(message, _args, { apiClient }) {
     const sent = Date.now();
-    await interaction.deferReply();
-
-    const wsPing = interaction.client.ws.ping;
+    const wsPing = message.client.ws.ping;
     const botLatency = Date.now() - sent;
 
     let apiStatus = 'unreachable';
@@ -57,10 +52,10 @@ export const pingCommand: SlashCommand = {
           : []),
         embedField(
           `${CUSTOM_EMOJIS.servers} Servers`,
-          `\`${interaction.client.guilds.cache.size}\``,
+          `\`${message.client.guilds.cache.size}\``,
         ),
       );
 
-    await interaction.editReply({ embeds: [embed] });
+    await message.reply({ embeds: [embed] });
   },
 };
