@@ -1,0 +1,22 @@
+{
+  "name": "@mw-platform/database",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "generate": "prisma generate",
+    "migrate:dev": "prisma migrate dev",
+    "db:push": "prisma db push",
+    "postinstall": "prisma generate"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.9.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.32",
+    "prisma": "^6.9.0",
+    "typescript": "^5.8.3"
+  }
+}
