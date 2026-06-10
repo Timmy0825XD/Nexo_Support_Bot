@@ -2,6 +2,11 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module.js';
 
 async function bootstrap() {
+  if (!process.env.INTERNAL_API_KEY) {
+    console.error('Missing INTERNAL_API_KEY in environment');
+    process.exit(1);
+  }
+
   const app = await NestFactory.create(AppModule);
 
   app.setGlobalPrefix('api');
