@@ -10,10 +10,60 @@ datasource db {
 
 /// Discord server configuration (multi-tenant by guild)
 model Guild {
-  id        String   @id
-  prefix    String   @default("[]")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String       @id
+  prefix      String       @default("[]")
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  tournaments Tournament[]
 
   @@map("guilds")
+}
+
+model Tournament {
+  id               String         @id @default(cuid())
+  guildId          String
+  name             String
+  format           String
+  registrationOpen Boolean        @default(false)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  guild            Guild          @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  registrations    Registration[]
+
+  @@index([guildId])
+  @@map("tournaments")
+}
+
+model Registration {
+  id               String        @id @default(cuid())
+  tournamentId     String
+  teamName         String
+  status           String        @default("pending")
+  flaggedForReview Boolean       @default(false)
+  submitterIp      String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  tournament       Tournament    @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  participants     Participant[]
+
+  @@index([tournamentId])
+  @@index([tournamentId, submitterIp])
+  @@map("registrations")
+}
+
+model Participant {
+  id             String       @id @default(cuid())
+  registrationId String
+  slotIndex      Int
+  discordTag     String
+  discordId      String
+  inGameName     String
+  inGameId       String
+  currentTitle   String
+  registration   Registration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+
+  @@index([registrationId])
+  @@index([discordId])
+  @@index([inGameId])
+  @@map("participants")
 }
