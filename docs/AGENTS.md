@@ -59,6 +59,8 @@ Crear un módulo NestJS por dominio: `guilds`, `tournaments`, `registration`, `s
 - **Respuestas en embeds** — inglés, claras, útiles y coherentes. Ver [`EMOJIS.md`](./EMOJIS.md).
 - Emojis personalizados desde `apps/bot/src/constants/emojis.ts` — nunca hardcodear IDs sueltos en comandos.
 - Helpers reutilizables en `apps/bot/src/utils/embeds.ts` (`successEmbed`, `errorEmbed`, `infoEmbed`).
+- **Opciones dinámicas (autocomplete)** — priorizar listas buscables sobre IDs en texto plano. El usuario elige por nombre legible; el bot envía el `value` interno (ID) a la API. Fuentes reutilizables en `apps/bot/src/autocomplete/sources/`; utilidades en `apps/bot/src/autocomplete/utils.ts`. Cada comando expone `autocomplete` opcional en su definición (`commands/types.ts`); `index.ts` enruta `InteractionCreate` autocomplete al handler del comando.
+- Permisos Discord: comandos visibles para todos (`setDefaultMemberPermissions(null)`); validar rol/permiso al ejecutar con `guards/permissions.ts`.
 
 ### Next.js — front
 
@@ -347,6 +349,8 @@ Ver [`GITFLOW.md`](./GITFLOW.md) para ramas, PRs y versionado. Resumen de commit
 - [ ] Interacciones Discord no exceden timeout (defer si necesario)
 - [ ] Comando autocontenido
 - [ ] Respuestas en inglés con embeds; emojis desde `constants/emojis.ts`
+- [ ] Selectores de entidad vía autocomplete (no IDs manuales salvo excepción justificada)
+- [ ] Permisos validados en `execute`, no ocultos con `default_member_permissions`
 
 ### Front
 
