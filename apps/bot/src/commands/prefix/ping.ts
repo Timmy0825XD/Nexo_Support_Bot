@@ -29,10 +29,10 @@ export const pingPrefixCommand: PrefixCommand = {
     const allHealthy = apiOk && (database === undefined || dbOk);
 
     const statusLine = allHealthy
-      ? `${CUSTOM_EMOJIS.done} **All systems operational.** Response times look good.`
-      : `${CUSTOM_EMOJIS.error} **Attention required.** One or more services are not responding correctly.`;
+      ? `**All systems operational.** Response times look good.`
+      : `**Attention required.** One or more services are not responding correctly.`;
 
-    const embed = infoEmbed(`${CUSTOM_EMOJIS.latency} Pong!`, statusLine)
+    const embed = infoEmbed(`Pong!`, statusLine)
       .setColor(allHealthy ? EMBED_COLORS.success : EMBED_COLORS.warning)
       .addFields(
         embedField(`${CUSTOM_EMOJIS.botPing} Bot Latency`, `\`${botLatency}ms\``),

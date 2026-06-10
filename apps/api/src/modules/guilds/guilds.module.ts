@@ -6,6 +6,6 @@ import { GuildsService } from './guilds.service.js';
 @Module({
   controllers: [GuildsController],
   providers: [GuildsService, GuildsRepository],
-  exports: [GuildsService],
+  exports: [GuildsService, GuildsRepository],
 })
 export class GuildsModule {}

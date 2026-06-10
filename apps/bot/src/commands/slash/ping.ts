@@ -6,7 +6,8 @@ import { embedField, infoEmbed } from '../../utils/embeds.js';
 export const pingCommand: SlashCommand = {
   data: new SlashCommandBuilder()
     .setName('ping')
-    .setDescription('Check bot latency and API connection status'),
+    .setDescription('Check bot latency and API connection status')
+    .setDefaultMemberPermissions(null),
 
   async execute(interaction, { apiClient }) {
     const sent = Date.now();
@@ -34,10 +35,10 @@ export const pingCommand: SlashCommand = {
     const allHealthy = apiOk && (database === undefined || dbOk);
 
     const statusLine = allHealthy
-      ? `${CUSTOM_EMOJIS.done} **All systems operational.** Response times look good.`
-      : `${CUSTOM_EMOJIS.error} **Attention required.** One or more services are not responding correctly.`;
+      ? `**All systems operational.** Response times look good.`
+      : `**Attention required.** One or more services are not responding correctly.`;
 
-    const embed = infoEmbed(`${CUSTOM_EMOJIS.latency} Pong!`, statusLine)
+    const embed = infoEmbed(`Pong!`, statusLine)
       .setColor(allHealthy ? EMBED_COLORS.success : EMBED_COLORS.warning)
       .addFields(
         embedField(`${CUSTOM_EMOJIS.botPing} Bot Latency`, `\`${botLatency}ms\``),

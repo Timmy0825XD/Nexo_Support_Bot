@@ -1,16 +1,10 @@
 import 'dotenv/config';
-import {
-  Client,
-  Collection,
-  Events,
-  GatewayIntentBits,
-  REST,
-  Routes,
-} from 'discord.js';
+import { Client, Collection, Events, GatewayIntentBits } from 'discord.js';
 import { loadPrefixCommands, loadSlashCommands } from './commands/loader.js';
 import type { PrefixCommand, SlashCommand } from './commands/types.js';
 import { createApiClient } from './services/api-client.js';
 import { GuildConfigCache } from './services/guild-config.js';
+import { registerSlashCommands } from './services/register-commands.js';
 import { waitForApi } from './services/wait-for-api.js';
 
 const token = process.env.DISCORD_TOKEN;
@@ -21,7 +15,16 @@ if (!token || !clientId) {
   process.exit(1);
 }
 
-const apiClient = createApiClient(process.env.API_BASE_URL ?? 'http://localhost:3000/api');
+const apiKey = process.env.INTERNAL_API_KEY;
+if (!apiKey) {
+  console.error('Missing INTERNAL_API_KEY in environment');
+  process.exit(1);
+}
+
+const apiClient = createApiClient(
+  process.env.API_BASE_URL ?? 'http://localhost:3000/api',
+  apiKey,
+);
 const guildConfig = new GuildConfigCache();
 
 const client = new Client({
@@ -58,12 +61,17 @@ client.once(Events.ClientReady, async (readyClient) => {
     console.warn('Bot will keep running; retry with /settings or restart once API is up.');
   }
 
-  const rest = new REST().setToken(token);
   const commandData = loadSlashCommands().map((cmd) => cmd.data.toJSON());
+  const devGuildId = process.env.DISCORD_GUILD_ID;
 
   try {
-    await rest.put(Routes.applicationCommands(clientId), { body: commandData });
-    console.log(`Registered ${commandData.length} slash command(s)`);
+    await registerSlashCommands({
+      token,
+      clientId,
+      guildId: devGuildId,
+      commands: commandData,
+    });
+
   } catch (error) {
     console.error('Failed to register slash commands:', error);
   }
@@ -75,6 +83,24 @@ client.on(Events.GuildCreate, async (guild) => {
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
+  if (interaction.isAutocomplete()) {
+    const command = slashCommands.get(interaction.commandName);
+
+    if (!command?.autocomplete) {
+      await interaction.respond([]);
+      return;
+    }
+
+    try {
+      await command.autocomplete(interaction, commandContext);
+    } catch (error) {
+      console.error(`Autocomplete failed for /${interaction.commandName}:`, error);
+      await interaction.respond([]);
+    }
+
+    return;
+  }
+
   if (!interaction.isChatInputCommand()) return;
 
   const command = slashCommands.get(interaction.commandName);
