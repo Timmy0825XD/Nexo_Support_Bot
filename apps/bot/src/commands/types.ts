@@ -15,6 +15,10 @@ export interface SlashCommand {
     interaction: import('discord.js').ChatInputCommandInteraction,
     context: CommandContext,
   ) => Promise<void>;
+  autocomplete?: (
+    interaction: import('discord.js').AutocompleteInteraction,
+    context: CommandContext,
+  ) => Promise<void>;
 }
 
 export interface PrefixCommand {

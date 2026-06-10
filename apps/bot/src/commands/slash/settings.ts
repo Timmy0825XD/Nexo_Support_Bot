@@ -1,6 +1,7 @@
 import { PermissionFlagsBits, SlashCommandBuilder } from 'discord.js';
 import { ApiClientError } from '../../services/api-client.js';
 import { CUSTOM_EMOJIS } from '../../constants/emojis.js';
+import { requireMemberPermissions } from '../../guards/permissions.js';
 import { embedField, errorEmbed, infoEmbed, successEmbed } from '../../utils/embeds.js';
 import type { SlashCommand } from '../types.js';
 
@@ -8,7 +9,7 @@ export const settingsCommand: SlashCommand = {
   data: new SlashCommandBuilder()
     .setName('settings')
     .setDescription('Manage server configuration')
-    .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
+    .setDefaultMemberPermissions(null)
     .addSubcommand((subcommand) =>
       subcommand.setName('info').setDescription('View current server settings'),
     )
@@ -27,13 +28,12 @@ export const settingsCommand: SlashCommand = {
     ),
 
   async execute(interaction, { apiClient, guildConfig }) {
-    if (!interaction.guildId) {
-      await interaction.reply({
-        embeds: [errorEmbed('Guild only', 'This command can only be used inside a server.')],
-        ephemeral: true,
-      });
-      return;
-    }
+    const guildId = await requireMemberPermissions(
+      interaction,
+      PermissionFlagsBits.ManageGuild,
+      'Manage Server',
+    );
+    if (!guildId) return;
 
     const subcommand = interaction.options.getSubcommand();
 
@@ -41,7 +41,7 @@ export const settingsCommand: SlashCommand = {
       await interaction.deferReply({ ephemeral: true });
 
       try {
-        const guild = await guildConfig.refreshPrefix(interaction.guildId, apiClient);
+        const guild = await guildConfig.refreshPrefix(guildId, apiClient);
 
         const embed = infoEmbed(
           `${CUSTOM_EMOJIS.servers} Server Settings`,
@@ -68,7 +68,7 @@ export const settingsCommand: SlashCommand = {
     const newPrefix = interaction.options.getString('value');
 
     if (!newPrefix) {
-      const currentPrefix = guildConfig.getPrefix(interaction.guildId);
+      const currentPrefix = guildConfig.getPrefix(guildId);
 
       await interaction.reply({
         embeds: [
@@ -85,8 +85,8 @@ export const settingsCommand: SlashCommand = {
     await interaction.deferReply({ ephemeral: true });
 
     try {
-      const guild = await apiClient.updateGuild(interaction.guildId, { prefix: newPrefix });
-      guildConfig.setPrefix(interaction.guildId, guild.prefix);
+      const guild = await apiClient.updateGuild(guildId, { prefix: newPrefix });
+      guildConfig.setPrefix(guildId, guild.prefix);
 
       await interaction.editReply({
         embeds: [

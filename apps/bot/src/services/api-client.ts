@@ -2,9 +2,19 @@ import {
   apiErrorSchema,
   guildResponseSchema,
   healthResponseSchema,
+  registrationListResponseSchema,
+  registrationResponseSchema,
+  tournamentListResponseSchema,
+  tournamentResponseSchema,
+  type CreateTournamentInput,
   type GuildResponse,
+  type RegistrationListResponse,
+  type RegistrationResponse,
+  type TournamentListResponse,
+  type TournamentResponse,
   type UpdateGuildInput,
   type UpsertGuildInput,
+  type ValidateRegistrationInput,
 } from '@mw-platform/shared';
 
 export class ApiClientError extends Error {
@@ -22,7 +32,12 @@ async function parseResponse<T>(
   response: Response,
   schema?: { safeParse: (data: unknown) => { success: boolean; data?: T } },
 ): Promise<T> {
-  const data = await response.json();
+  const text = await response.text();
+  let data: unknown = null;
+
+  if (text.trim()) {
+    data = JSON.parse(text) as unknown;
+  }
 
   if (!response.ok) {
     const parsedError = apiErrorSchema.safeParse(data);
@@ -45,7 +60,7 @@ async function parseResponse<T>(
   return data as T;
 }
 
-export function createApiClient(baseUrl: string) {
+export function createApiClient(baseUrl: string, apiKey: string) {
   const request = async <T>(
     path: string,
     options: RequestInit = {},
@@ -55,6 +70,7 @@ export function createApiClient(baseUrl: string) {
       ...options,
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
         ...options.headers,
       },
       signal: options.signal ?? AbortSignal.timeout(5000),
@@ -92,6 +108,72 @@ export function createApiClient(baseUrl: string) {
           body: JSON.stringify(input),
         },
         guildResponseSchema,
+      );
+    },
+
+    async listTournaments(guildId: string) {
+      return request<TournamentListResponse>(
+        `/guilds/${guildId}/tournaments`,
+        { method: 'GET' },
+        tournamentListResponseSchema,
+      );
+    },
+
+    async createTournament(guildId: string, input: CreateTournamentInput) {
+      return request<TournamentResponse>(
+        `/guilds/${guildId}/tournaments`,
+        {
+          method: 'POST',
+          body: JSON.stringify(input),
+        },
+        tournamentResponseSchema,
+      );
+    },
+
+    async getTournament(tournamentId: string) {
+      return request<TournamentResponse>(
+        `/tournaments/${tournamentId}`,
+        { method: 'GET' },
+        tournamentResponseSchema,
+      );
+    },
+
+    async deleteTournament(tournamentId: string) {
+      await request(`/tournaments/${tournamentId}`, { method: 'DELETE' });
+    },
+
+    async openRegistration(tournamentId: string) {
+      return request<TournamentResponse>(
+        `/tournaments/${tournamentId}/registration/open`,
+        { method: 'POST' },
+        tournamentResponseSchema,
+      );
+    },
+
+    async closeRegistration(tournamentId: string) {
+      return request<TournamentResponse>(
+        `/tournaments/${tournamentId}/registration/close`,
+        { method: 'POST' },
+        tournamentResponseSchema,
+      );
+    },
+
+    async listRegistrations(tournamentId: string) {
+      return request<RegistrationListResponse>(
+        `/tournaments/${tournamentId}/registrations`,
+        { method: 'GET' },
+        registrationListResponseSchema,
+      );
+    },
+
+    async validateRegistration(registrationId: string, input: ValidateRegistrationInput) {
+      return request<RegistrationResponse>(
+        `/registrations/${registrationId}`,
+        {
+          method: 'PATCH',
+          body: JSON.stringify(input),
+        },
+        registrationResponseSchema,
       );
     },
   };
